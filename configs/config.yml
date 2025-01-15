@@ -1,0 +1,70 @@
+model:
+  name: example_model
+  version: 0.1.0
+  params:
+    random_state: 42
+    test_size: 0.2
+
+# Data Processing
+data:
+  raw_data_path: data/raw/
+  raw_data_file_name: twitter_training.csv               #test_csv_with_empty_columns.csv #african_farm_households.csv #twitter_training.csv
+  raw_data_test_file_name:                               # raw data file for test (It also have to be processed in the same way that raw data file).                                                          # Put a blank if you don't have your own data test file and you want to split the provided                                                           raw data file
+                                                         # Important: plase if you provide a data test file, the name must to be the concatenation                                                              between raw_data_file_name (without extention) + the word "_test" + the extention
+  processed_data_path: data/processed/
+  row_data_column_id_index: -1                    # Index of the column that contains the row id. Usually 0. If different from -1, the column will be dropped.
+  raw_data_target_column:                         #The known target column name in the raw data. Used only in supervised learning.
+    name: sentiment                               # don't put the target column name if the model is unsupervised
+    type: "categorical"                           # Options: "categorical", "numerical"
+
+  processed_data_path: data/processed/
+
+  missing_values:
+    strategy_numeric: "mean"
+    strategy_categorical: "mode"
+  outlier_handling:
+    method: "iqr"
+  keep_original_column_data_after_encode: False # If True, the original columns will be kept after encoding (categorial feature). If False, the original columns will be dropped.
+
+# Features configuration
+features:
+
+  text_features: # If no texte features, supress or comment all the text_features section !
+    keep_original_after_vectorize: False # If True, the original text columns will be kept after vectorization. If False, the original columns will                                           be dropped. After vectorization, the orib-ginal text columns will be dropped.
+    columns: ["tweet"]
+    max_features: 50          # up to 100 features (words)
+    min_df: 0.02               # Remove rare words
+    max_df: 0.90               # Remove too common words    
+
+  # Main Features (an array of features names). Used to prioritize some features over others. if not specified, no feature will be prioritized. Each will main its original value (no weight applied)
+  main_features: 
+   # - adm0
+   # - adm1
+
+  main_features_weight: 3 # Will be used to multiply the main features values. If not specified, the main features will keep their original values.
+
+# Training
+  # Model Selection
+training:
+  model:
+    type: "random_forest"  # Options:
+    params:
+      n_estimators: 100
+      max_depth: 10
+      random_state: 42
+  
+  unsupervised_learning_task: clustering # Options: clustering, dimension_reduction
+  
+  validation:
+    test_size: 0.2
+    cross_validation: true
+    n_splits: 5
+
+  # Training Parameters  
+  params:
+    batch_size: 32
+    epochs: 100
+    learning_rate: 0.001
+    validation_split: 0.2
+    early_stopping: true
+    patience: 5   
